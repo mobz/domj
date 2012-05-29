@@ -1,12 +1,12 @@
 DOM transport via JSON (DOMj)
 ========================================================================================
 
-This proposes a standard for describing the Document Object Model using Javascript Objects. Typically the DOM is described in HTML, however in a javascript based application, HTML is sub-optimal with regard to generation and transformation, typically requiring a templating solution. In addition a Javascript Object based syntax can represent data which is impossible or less precise than text.
+This proposes a standard for describing the Document Object Model using Javascript Objects. Typically the DOM is described in HTML, however in a javascript based application, HTML is sub-optimal with regard to generation and transformation, typically requiring a templating solution. In addition a Javascript Object based syntax can represent data which is impossible or less precise than text, such as dates, functions and [Files](https://developer.mozilla.org/en/DOM/File).
 
 DOMj can be generated and transformed in browsers, on the server and be transported over networks.
 
-Syntax
-------
+Example
+-------
 
 Basic Example
 
@@ -14,16 +14,46 @@ Basic Example
     
 produces equivalent DOM to the following html ```<DIV id="header" class="page-header"></DIV>```
 
-* DOMj specifies a subset of [valid ecmaScript](http://www.ecma-international.org/publications/standards/Ecma-262.htm).
-* DOMj embedded in source code does not need to be strict [JSON](http://json.org/).
-* DOMj _can be_ encoded in strict JSON for serialisation
+Levels
+------
+
+DOMj has two levels; CORE and LIVE
+
+* `CORE` specifies a set of functionality similar to HTML and is appropriate for serialisation in strict JSON
+* `LIVE` specified an extended set of functionality suitable for use in runtime environments and encoding in javascript source files.
+
+* All DOMj specifies a subset of [valid ecmaScript](http://www.ecma-international.org/publications/standards/Ecma-262.htm).
+* DOMj-CORE _can be_ encoded in [JSON](http://json.org/) for serialisation, storage and transport
+* DOMj-LIVE includes _all_ CORE functionlity
+
+Syntax
+------
+
+* DOM elements are represented by a simple javascript object `{ }`
+* DOM properties are represented by a name value pair in the object. For example;
+	* `id`
+	* `href`
+	* `title`
+* Any object which inherits from the [HTMLElement](http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-882764350) can be created
+* Any property on any object which has a setter can be prepresented
+* Several names are reserved and provide additional features
+	* `tag` accepts a string and sets the element tagName when the element is created ( required )
+	* `cls` is shorthand for the className property
+	* `children` accepts an array and represents the child nodes of the element
+	* `text` accepts a string and creates a single child TextNode
+	* `data` accepts an object of name/value pairs that sets custom data attributes of the element
+	* `css` accepts an object of name/value pairs that sets css properties of the element
+	* `on(name)` accepts a function and allows an event handler to be bound to the `name` event. The event is bound to the bubbling phase
+
+Note that ```children```, ```text``` and ```html``` all set the children of the node and only one can be defined per node.
+
 
 Environment
 -----------
 
-DOMj can be used on the server side, to create an object which would be delivered to a browser for rendering ( rather than sending HTML )
+DOMj-CORE can be used on the server side, to create an object which would be delivered to a browser for rendering ( rather than sending HTML )
 
-DOMj can be used directly in the browser as an intermediate data type, rather than using a text only (html) templating engine
+DOMj-LIVE can be used in the browser as an intermediate data type, rather than using a text only (html) templating engine
 
 DOMj produces DOM directly without passing through text based markup, so can be used in ```HTML```, ```XHTML```, ```SVG``` and ```XML``` documents. It can also be used in mixed environments, for example, creating SVG elements inside an HTML document.
 
@@ -32,21 +62,6 @@ DOMj does need distinguish between self-closing tags and tags with empty bodies,
 DOMj does not need to consider the encoding type of the underlying document, only the encoding type of the source
 
 The following represents the minimum features for a compliant implementation
-
-* a DOM element is represented by a simple javascript object ```{ }```
-* a DOM attribute is represented by a name value pair in the object ```title="Html element node"```
-* Several names are reserved and provide additional features
-	* ```tag``` accepts a string and sets the element tagName
-	* ```id``` accepts a string and sets the element id
-	* ```cls``` accepts a space separated token string and sets the element className
-	* ```children``` accepts an array and represents the child nodes of the element
-	* ```text``` accepts a string and creates a single child TextNode
-	* ```data``` accepts an object of name/value pairs that sets custom data attributes of the element
-	* ```html``` accepts a string of arbitrary html data that is passed to the innerHTML property
-	* ```css``` accepts an object of name/value pairs that sets css properties of the element
-	* ```on(name)``` accepts a function and allows an event handler to be bound to the ```name``` event. The event is bound to the bubbling phase
-
-Note that ```children```, ```text``` and ```html``` all set the children of the node and only one can be defined per node.
 
 ```tag``` Attribute
 -------------
@@ -66,42 +81,26 @@ DOM Interface:
 
     document.createElement( _tag_ );
 
-```id``` Attribute
+Setting Properties
 ------------------
 
-* Sets the ```id``` property of the element
-* Optional
+* Set properties on an element
+* Property must exist for that element class and must have a setter
+* Property value must be of the appropriate type the property, or convertible to the appropriate type
 
 Usage:
 
-    { tag: "DIV", id: "header" }
+    { tag: "INPUT", type: "date", id: "the_id", valueAsDate: Date.now(), diabled: true } 
 
-DOM Interface:
+DOM Interface
 
-    var el = document.createElement('DIV');
-    el.id = _id_;
+    el[ _property_ ] = _value_
 
-```cls``` Attribute
--------------------
-
-* Sets the ```className``` property of the element
-* Optional
-* Can be used to set multiple classes (space separated)
-
-Usage:
-
-    { tag: "BLOCKQUOTE", cls: "deep-inset blue" }
-
-DOM Interface:
-
-    var el = document.createElement('DIV');
-    el.className = _cls_;
-
-```text``` Attribute
+`text` Attribute
 --------------------
 
 * defines a single child TextNode for an element
-* can not be used with ```children``` or ```html```
+* can not be used with ```children``` or ```innerHTML```
 * html escaping of text is not required and html entities are not allowed
 * special characters should be specified using javascript text escapes and unicode code points eg. "\n" (newline) or "\u2122" (trademark symbol)
 * Is not effected by the encoding format of the document  
@@ -122,7 +121,10 @@ Dom Interface:
 * defines children elements of a parent element
 * Optional
 * Accepts an array of objects
-
+* objects may be
+	* null ( nothing is added - this is a noop )
+	* string ( adds a TextNode 
+	
 Usage:
 
     { tag: "UL", children: [
@@ -131,11 +133,18 @@ Usage:
         { tag: "LI", text: "Lime" }
     ] }
 
+    { tag: "P", children: [
+        "Hey, check out this ",
+        { tag: "A", href: "info.html", text: "link" },
+        " for more information.",
+        { tag: "BR" }
+    ] }
+
 DOM Interface:
 
     for( i = 0; i < _children_.length; i++ ) {
-      el = _create_child_node_( _children_[i] );
-      el.appendTo( _parent_ )
+      _childNode_ = _create_child_node_( _children_[i] );
+      el.appendChild( _childNode_ )
     }
 
 ```data``` Attribute
@@ -143,3 +152,54 @@ DOM Interface:
 
 
 etc...
+
+
+WIP
+===
+
+
+
+Formal Syntax Description
+---------------------------
+
+_domTree_
+> `{` _properties_ `}`
+
+_properties_
+> _property_
+> _property_ `,` _properties_
+
+_property_
+> _propertyName_ `:` _propertyValue
+> `tagName` `:` _string_
+> `children` `:` _childrenArray_
+> `text` `:` _string_
+> `html` `:` _string_
+> `on` _string_ `:` _function_
+
+_propertyValue_
+> <nativeObject>
+> <object>
+> <array>
+> <string_>
+> _function_
+> `true`
+> `false`
+> `null`
+
+_childrenArray_
+> `[ ]`
+> `[ _members_ ]`
+
+_members_
+> _member_
+> _member_ `,` _members_
+
+_member_
+> `null`
+> _string_
+> _domTree_
+> _nativeObject_
+
+
+
