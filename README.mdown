@@ -45,7 +45,7 @@ Syntax
 	* `css` accepts an object of name/value pairs that sets css properties of the element
 	* `on(name)` accepts a function and allows an event handler to be bound to the `name` event. The event is bound to the bubbling phase
 
-Note that ```children```, ```text``` and ```html``` all set the children of the node and only one can be defined per node.
+Note that `children`, `text` and `innerHTML` all set the children of the node and only one can be defined per node.
 
 
 Environment
@@ -57,14 +57,16 @@ DOMj-LIVE can be used in the browser as an intermediate data type, rather than u
 
 DOMj produces DOM directly without passing through text based markup, so can be used in ```HTML```, ```XHTML```, ```SVG``` and ```XML``` documents. It can also be used in mixed environments, for example, creating SVG elements inside an HTML document.
 
-DOMj does need distinguish between self-closing tags and tags with empty bodies, as there are no distinction in DOM.
+DOMj does not need distinguish between self-closing tags and tags with empty bodies, as there are no distinction in DOM.
 
 DOMj does not need to consider the encoding type of the underlying document, only the encoding type of the source
 
-The following represents the minimum features for a compliant implementation
 
-```tag``` Attribute
--------------
+Property Specifics
+==================
+
+The ```tag``` Property
+----------------------
 
 * Sets the tagName of the element.
 * Is required for top level object, for children it is optional, the default value is 'DIV'.
@@ -96,7 +98,7 @@ DOM Interface
 
     el[ _property_ ] = _value_
 
-`text` Attribute
+The `text` property
 --------------------
 
 * defines a single child TextNode for an element
@@ -115,7 +117,7 @@ Dom Interface:
     el.appendChild( text );
     
 
-```children``` Attribute
+The ```children``` property
 -------------------
 
 * defines children elements of a parent element
@@ -147,8 +149,8 @@ DOM Interface:
       el.appendChild( _childNode_ )
     }
 
-```data``` Attribute
---------------------
+The ```data``` Property
+-----------------------
 
 
 etc...
@@ -166,39 +168,39 @@ _domTree_
 > `{` _properties_ `}`
 
 _properties_
-> _property_
+> _property_  
 > _property_ `,` _properties_
 
 _property_
-> _propertyName_ `:` _propertyValue
-> `tagName` `:` _string_
-> `children` `:` _childrenArray_
-> `text` `:` _string_
-> `html` `:` _string_
+> _propertyName_ `:` _propertyValue  
+> `tagName` `:` _string_  
+> `children` `:` _childrenArray_  
+> `text` `:` _string_  
+> `html` `:` _string_  
 > `on` _string_ `:` _function_
 
 _propertyValue_
-> <nativeObject>
-> <object>
-> <array>
-> <string_>
-> _function_
-> `true`
-> `false`
-> `null`
+> _nativeObject_  
+> _object_  
+> _array_  
+> _string_  
+> _function_  
+> `true`  
+> `false`  
+> `null`  
 
 _childrenArray_
-> `[ ]`
-> `[ _members_ ]`
+> `[ ]`  
+> `[ _members_ ]`  
 
 _members_
-> _member_
+> _member_  
 > _member_ `,` _members_
 
 _member_
-> `null`
-> _string_
-> _domTree_
+> `null`  
+> _string_  
+> _domTree_  
 > _nativeObject_
 
 
