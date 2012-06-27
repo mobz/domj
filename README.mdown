@@ -31,18 +31,17 @@ Syntax
 
 * DOM elements are represented by a simple javascript object `{ }`
 * DOM properties are represented by a name value pair in the object. For example;
-	* `id`
-	* `href`
-	* `title`
+	* `id: "foo"`
+	* `href: "http://github.com/"`
+	* `disabled: true`
 * Any object which inherits from the [HTMLElement](http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-882764350) can be created
-* Any property on any object which has a setter can be prepresented
+* Any property on any object which has a setter can be represented
 * Several names are reserved and provide additional features
 	* `tag` accepts a string and sets the element tagName when the element is created ( required )
-	* `cls` is shorthand for the className property
 	* `children` accepts an array and represents the child nodes of the element
 	* `text` accepts a string and creates a single child TextNode
-	* `data` accepts an object of name/value pairs that sets custom data attributes of the element
-	* `css` accepts an object of name/value pairs that sets css properties of the element
+	* `dataset` accepts an object of name/value pairs that sets custom data attributes of the element
+	* `style` accepts an object of name/value pairs that sets style properties of the element
 	* `on(name)` accepts a function and allows an event handler to be bound to the `name` event. The event is bound to the bubbling phase
 
 Note that `children`, `text` and `innerHTML` all set the children of the node and only one can be defined per node.
@@ -149,7 +148,7 @@ DOM Interface:
       el.appendChild( _childNode_ )
     }
 
-The ```data``` Property
+The ```dataset``` Property
 -----------------------
 
 
@@ -173,10 +172,11 @@ _properties_
 
 _property_
 > _propertyName_ `:` _propertyValue  
-> `tagName` `:` _string_  
+> `tag` `:` _string_  
 > `children` `:` _childrenArray_  
 > `text` `:` _string_  
-> `html` `:` _string_  
+> `dataset` `:` _object_  
+> `style` `:` _object_  
 > `on` _string_ `:` _function_
 
 _propertyValue_
