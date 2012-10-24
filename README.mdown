@@ -14,6 +14,12 @@ Basic Example
     
 produces equivalent DOM to the following html ```<DIV id="header" class="page-header"></DIV>```
 
+Reference Implementation
+--------
+
+ * [Reference Implementation](https://github.com/mobz/joey/blob/master/src/joey.js)
+ * [Try It! - live coding](http://mobz.github.com/joey/fiddle.html)
+
 Conformance
 ------
 
@@ -164,7 +170,7 @@ The ```on```* Property - binding eventListeners
 
 Usage:
 
-    { tag: "DIV", onclick: function() { alert('clicked'); } }
+    { tag: "DIV", onclick: function( ev ) { alert( ev.type ); } }
     { tag: "DIV", onmouseover: this.mouseOverHandler }
     { tag: "DIV", ontouchstart: {
         touched: false,
@@ -223,6 +229,7 @@ Property Aliases
 
 To improve readability and conciseness of DOMj, aliases to common properties are defined as below
 
+* ```tag``` -> ```tagName```
 * ```text``` -> ```textContent```
 * ```cls``` -> ```className```
 
